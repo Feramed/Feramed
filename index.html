@@ -13,24 +13,42 @@
     </div>
 
     <script>
-        // Инициализация базы данных (только один раз!)
-        const supabase = supabase.createClient('https://inyiwbyffaqziyyusipx.supabase.co', 'sb_publishable_GtH9_fEmD9qoLJ4w-ruvwQ_9OvqN84V');
+        // Используем dbClient вместо supabase, чтобы избежать конфликтов имен
+        const dbClient = supabase.createClient(
+            'https://inyiwbyffaqziyyusipx.supabase.co', 
+            'sb_publishable_GtH9_fEmD9qoLJ4w-ruvwQ_9OvqN84V'
+        );
         
         async function init() {
             try {
-                const { data, error } = await supabase.from('orders').select('*');
+                const { data, error } = await dbClient.from('orders').select('*');
+                
                 if (error) throw error;
                 
+                if (!data || data.length === 0) {
+                    document.getElementById('content').innerHTML = "В базе пока нет заказов.";
+                    return;
+                }
+                
                 document.getElementById('content').innerHTML = `
-                    <p class="mb-4">Система активна. Заказов в базе: ${data.length}</p>
+                    <p class="mb-4 font-semibold">Система активна. Заказов в базе: ${data.length}</p>
                     <ul class="space-y-2">
-                        ${data.map(o => `<li class="p-2 border rounded">${o.id || 'Заказ'} - Статус: ${o.status || 'нет'}</li>`).join('')}
+                        ${data.map(o => `
+                            <li class="p-3 border rounded shadow-sm hover:bg-teal-50 transition">
+                                <span class="font-bold">ID: ${o.id || '---'}</span> | 
+                                <span class="text-gray-600">Статус: ${o.status || 'нет данных'}</span>
+                            </li>
+                        `).join('')}
                     </ul>
                 `;
             } catch (e) {
-                document.getElementById('content').innerHTML = "Ошибка: " + e.message;
+                document.getElementById('content').innerHTML = 
+                    "<p class='text-red-500'>Ошибка подключения к базе: " + e.message + "</p>";
+                console.error("Ошибка Supabase:", e);
             }
         }
+        
+        // Запускаем загрузку
         init();
     </script>
 </body>
