@@ -13,7 +13,7 @@
     </div>
 
     <script>
-        // Подключение к вашей базе
+        // Инициализация базы данных (только один раз!)
         const supabase = supabase.createClient('https://inyiwbyffaqziyyusipx.supabase.co', 'sb_publishable_GtH9_fEmD9qoLJ4w-ruvwQ_9OvqN84V');
         
         async function init() {
@@ -28,7 +28,7 @@
                     </ul>
                 `;
             } catch (e) {
-                document.getElementById('content').innerHTML = "Ошибка подключения к базе: " + e.message;
+                document.getElementById('content').innerHTML = "Ошибка: " + e.message;
             }
         }
         init();
