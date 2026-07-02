@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>FERAMED LOGISTICS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div id="app" class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
+        <h1 class="text-2xl font-bold mb-6 text-teal-600">FERAMED LOGISTICS</h1>
+        <div id="content">Загрузка системы...</div>
+    </div>
+
+    <script>
+        // Подключение к вашей базе
+        const supabase = supabase.createClient('https://inyiwbyffaqziyyusipx.supabase.co', 'sb_publishable_GtH9_fEmD9qoLJ4w-ruvwQ_9OvqN84V');
+        
+        async function init() {
+            try {
+                const { data, error } = await supabase.from('orders').select('*');
+                if (error) throw error;
+                
+                document.getElementById('content').innerHTML = `
+                    <p class="mb-4">Система активна. Заказов в базе: ${data.length}</p>
+                    <ul class="space-y-2">
+                        ${data.map(o => `<li class="p-2 border rounded">${o.id || 'Заказ'} - Статус: ${o.status || 'нет'}</li>`).join('')}
+                    </ul>
+                `;
+            } catch (e) {
+                document.getElementById('content').innerHTML = "Ошибка подключения к базе: " + e.message;
+            }
+        }
+        init();
+    </script>
+</body>
+</html>
