@@ -4,54 +4,53 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ферамед · Диспетчер</title>
-<!-- Стили оставьте прежние, они у вас отличные -->
+<style>
+  :root{ --navy:#10243E; --teal:#17A398; --amber:#F2A93B; --bg:#F6F5F1; --card:#FFFFFF; --text:#142433; --muted:#6B7A8D; --line:#E4E1D8; --danger:#D64545; --radius:10px; }
+  body{margin:0;background:var(--bg);color:var(--text);font-family:sans-serif;}
+  .container{max-width:1100px;margin:0 auto;padding:20px;}
+  .role-picker{max-width:420px;margin:60px auto;text-align:center;}
+  .options{display:flex;flex-direction:column;gap:10px;}
+  button{cursor:pointer;padding:15px;border-radius:10px;border:1px solid #ccc;background:#fff;}
+</style>
 </head>
 <body>
-<!-- (Здесь ваш HTML-код интерфейса из ферamed (2).html, просто добавьте кнопку в role-picker) -->
-<div class="options">
-  <button data-role="manager">Менеджер<span class="sub">Оформляет заказы клиникам</span></button>
-  <button data-role="driver">Водитель<span class="sub">Забирает и доставляет заказы</span></button>
-  <button data-role="leader">Руководство<span class="sub">Общая статистика</span></button>
-  <button data-role="accountant">Бухгалтер<span class="sub">Финансовая аналитика</span></button>
+
+<div class="container" id="pickerView">
+  <div class="role-picker">
+    <h1>Кто вы?</h1>
+    <div class="options">
+      <button data-role="manager">Менеджер</button>
+      <button data-role="driver">Водитель</button>
+      <button data-role="leader">Руководство</button>
+      <button data-role="accountant">Бухгалтер</button>
+    </div>
+  </div>
 </div>
 
-<!-- (Остальной HTML-код вашего ферamed (2).html остается без изменений) -->
-
 <script type="module">
-// ... импорты Firebase и настройки firebaseConfig остаются прежними ...
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+  import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+  import { getAuth } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
-// ОБНОВЛЕННАЯ ЛОГИКА РОЛЕЙ
-const ROLE_NAMES = {
-    manager: 'Менеджер',
-    driver: 'Водитель',
-    leader: 'Руководство',
-    accountant: 'Бухгалтер'
-};
+  const firebaseConfig = {
+    apiKey: "AIzaSyAnOTHALZItIekuI5kjG5nRV0ooh-jQo_Q",
+    authDomain: "feramed-67f4b.firebaseapp.com",
+    projectId: "feramed-67f4b",
+    storageBucket: "feramed-67f4b.firebasestorage.app",
+    messagingSenderId: "1066328830928",
+    appId: "1:1066328830928:web:86fa4a21d03d6ec9c4ffd5"
+  };
 
-// Функция showApp с поддержкой бухгалтера
-function showApp(){
-  hideAll();
-  document.getElementById('sessionChip').style.display='flex';
-  document.getElementById('sessionRoleTag').textContent = ROLE_NAMES[currentRole];
-  document.getElementById('sessionName').textContent = userProfile?.name || '';
-  
-  if(currentRole==='manager') document.getElementById('managerView').style.display='block';
-  if(currentRole==='driver') document.getElementById('driverView').style.display='block';
-  if(currentRole==='leader'||currentRole==='accountant') document.getElementById('leaderView').style.display='block';
-  
-  renderAll();
-}
+  initializeApp(firebaseConfig);
+  let currentRole = null;
 
-// Добавьте это в renderAll, чтобы менеджер видел свою аналитику
-function renderAll(){
-  if(currentRole==='manager') {
-      renderDispatch();
-      // Можно здесь же вызвать renderLeader(), если добавить блок аналитики в managerView
-  }
-  if(currentRole==='driver') renderDriverTab();
-  if(currentRole==='leader' || currentRole==='accountant') renderLeader();
-  if(document.getElementById('historyTab')?.style.display!=='none') renderHistory();
-}
+  document.querySelectorAll('[data-role]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      currentRole = btn.getAttribute('data-role');
+      alert('Роль выбрана: ' + currentRole + '. Теперь входите через форму.');
+      // Здесь код переходит к форме входа из вашего исходного файла
+    });
+  });
 </script>
 </body>
 </html>
