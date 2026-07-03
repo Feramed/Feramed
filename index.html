@@ -2,54 +2,57 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>FERAMED LOGISTICS</title>
+    <title>FERAMED LOGISTICS - Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-gray-100 p-8">
-    <div id="app" class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
-        <h1 class="text-2xl font-bold mb-6 text-teal-600">FERAMED LOGISTICS</h1>
-        <div id="content">Загрузка системы...</div>
+<body class="bg-gray-50 p-8">
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-2xl font-bold mb-6 text-teal-800">FERAMED LOGISTICS</h1>
+        
+        <div class="grid grid-cols-3 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                <p class="text-sm text-gray-500">ВЫРУЧКА (С НДС)</p>
+                <h2 id="total-revenue" class="text-3xl font-bold mt-2">0 UZS</h2>
+            </div>
+            <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                <p class="text-sm text-gray-500">ЧАСТНЫЕ КЛИНИКИ</p>
+                <h2 id="private-clinics" class="text-3xl font-bold mt-2">0 UZS</h2>
+            </div>
+            <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                <p class="text-sm text-gray-500">ГОСУДАРСТВЕННЫЕ</p>
+                <h2 id="state-clinics" class="text-3xl font-bold mt-2">0 UZS</h2>
+            </div>
+        </div>
+        <div id="loading" class="text-center p-10">Загрузка данных...</div>
     </div>
 
     <script>
-        // Используем dbClient вместо supabase, чтобы избежать конфликтов имен
         const dbClient = supabase.createClient(
             'https://inyiwbyffaqziyyusipx.supabase.co', 
             'sb_publishable_GtH9_fEmD9qoLJ4w-ruvwQ_9OvqN84V'
         );
         
-        async function init() {
+        async function loadDashboard() {
             try {
+                // Загружаем данные из таблицы orders
                 const { data, error } = await dbClient.from('orders').select('*');
-                
                 if (error) throw error;
                 
-                if (!data || data.length === 0) {
-                    document.getElementById('content').innerHTML = "В базе пока нет заказов.";
-                    return;
-                }
-                
-                document.getElementById('content').innerHTML = `
-                    <p class="mb-4 font-semibold">Система активна. Заказов в базе: ${data.length}</p>
-                    <ul class="space-y-2">
-                        ${data.map(o => `
-                            <li class="p-3 border rounded shadow-sm hover:bg-teal-50 transition">
-                                <span class="font-bold">ID: ${o.id || '---'}</span> | 
-                                <span class="text-gray-600">Статус: ${o.status || 'нет данных'}</span>
-                            </li>
-                        `).join('')}
-                    </ul>
-                `;
+                // Используем колонку total_sum и clinic_type
+                const total = data.reduce((sum, o) => sum + (Number(o.total_sum) || 0), 0);
+                const privateSum = data.filter(o => o.clinic_type === 'частная').reduce((sum, o) => sum + (Number(o.total_sum) || 0), 0);
+                const stateSum = data.filter(o => o.clinic_type === 'государственная').reduce((sum, o) => sum + (Number(o.total_sum) || 0), 0);
+
+                document.getElementById('total-revenue').innerText = total.toLocaleString() + ' UZS';
+                document.getElementById('private-clinics').innerText = privateSum.toLocaleString() + ' UZS';
+                document.getElementById('state-clinics').innerText = stateSum.toLocaleString() + ' UZS';
+                document.getElementById('loading').style.display = 'none';
             } catch (e) {
-                document.getElementById('content').innerHTML = 
-                    "<p class='text-red-500'>Ошибка подключения к базе: " + e.message + "</p>";
-                console.error("Ошибка Supabase:", e);
+                document.getElementById('loading').innerHTML = "Ошибка: " + e.message;
             }
         }
-        
-        // Запускаем загрузку
-        init();
+        loadDashboard();
     </script>
 </body>
 </html>
