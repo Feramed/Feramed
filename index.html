@@ -2,57 +2,39 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>FERAMED LOGISTICS - Dashboard</title>
+    <title>FERAMED LOGISTICS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-gray-50 p-8">
-    <div class="max-w-6xl mx-auto">
-        <h1 class="text-2xl font-bold mb-6 text-teal-800">FERAMED LOGISTICS</h1>
-        
-        <div class="grid grid-cols-3 gap-6 mb-8">
-            <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                <p class="text-sm text-gray-500">ВЫРУЧКА (С НДС)</p>
-                <h2 id="total-revenue" class="text-3xl font-bold mt-2">0 UZS</h2>
-            </div>
-            <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                <p class="text-sm text-gray-500">ЧАСТНЫЕ КЛИНИКИ</p>
-                <h2 id="private-clinics" class="text-3xl font-bold mt-2">0 UZS</h2>
-            </div>
-            <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                <p class="text-sm text-gray-500">ГОСУДАРСТВЕННЫЕ</p>
-                <h2 id="state-clinics" class="text-3xl font-bold mt-2">0 UZS</h2>
-            </div>
+<body class="bg-gray-50">
+
+    <!-- Экран входа -->
+    <div id="login-screen" class="flex flex-col items-center justify-center h-screen">
+        <h1 class="text-2xl font-bold mb-8 text-teal-800">FERAMED LOGISTICS</h1>
+        <div class="bg-white p-8 rounded-xl shadow-md w-80">
+            <h2 class="mb-4 text-center">Выберите роль</h2>
+            <button onclick="login('Руководитель')" class="w-full bg-teal-600 text-white p-2 rounded mb-2">Руководитель</button>
+            <button onclick="login('Курьер')" class="w-full bg-gray-600 text-white p-2 rounded">Курьер</button>
         </div>
-        <div id="loading" class="text-center p-10">Загрузка данных...</div>
+    </div>
+
+    <!-- Дашборд (скрыт по умолчанию) -->
+    <div id="dashboard" class="hidden p-8">
+        <h1 class="text-2xl font-bold mb-6 text-teal-800">FERAMED LOGISTICS</h1>
+        <div class="grid grid-cols-3 gap-6">
+            <!-- Карточки будут здесь -->
+            <div class="bg-white p-6 rounded-xl border border-gray-200">ВЫРУЧКА: <h2 id="total-revenue" class="text-2xl font-bold">0 UZS</h2></div>
+        </div>
+        <button onclick="location.reload()" class="mt-8 text-red-500">Выйти</button>
     </div>
 
     <script>
-        const dbClient = supabase.createClient(
-            'https://inyiwbyffaqziyyusipx.supabase.co', 
-            'sb_publishable_GtH9_fEmD9qoLJ4w-ruvwQ_9OvqN84V'
-        );
-        
-        async function loadDashboard() {
-            try {
-                // Загружаем данные из таблицы orders
-                const { data, error } = await dbClient.from('orders').select('*');
-                if (error) throw error;
-                
-                // Используем колонку total_sum и clinic_type
-                const total = data.reduce((sum, o) => sum + (Number(o.total_sum) || 0), 0);
-                const privateSum = data.filter(o => o.clinic_type === 'частная').reduce((sum, o) => sum + (Number(o.total_sum) || 0), 0);
-                const stateSum = data.filter(o => o.clinic_type === 'государственная').reduce((sum, o) => sum + (Number(o.total_sum) || 0), 0);
-
-                document.getElementById('total-revenue').innerText = total.toLocaleString() + ' UZS';
-                document.getElementById('private-clinics').innerText = privateSum.toLocaleString() + ' UZS';
-                document.getElementById('state-clinics').innerText = stateSum.toLocaleString() + ' UZS';
-                document.getElementById('loading').style.display = 'none';
-            } catch (e) {
-                document.getElementById('loading').innerHTML = "Ошибка: " + e.message;
-            }
+        function login(role) {
+            // Здесь будет логика проверки пароля или ключа
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            console.log("Вход как:", role);
         }
-        loadDashboard();
     </script>
 </body>
 </html>
