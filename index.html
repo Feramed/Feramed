@@ -68,18 +68,26 @@
     });
   });
 
-  // Логика входа
+ // Логика входа
   document.getElementById('loginBtn').addEventListener('click', async () => {
     const email = document.getElementById('loginEmail').value;
     const pass = document.getElementById('loginPassword').value;
     try {
       await signInWithEmailAndPassword(auth, email, pass);
-      alert('Успешный вход как ' + currentRole);
-      // Здесь код перенаправит на ваш дашборд
+      
+      // СКРЫВАЕМ ВХОД И ПОКАЗЫВАЕМ ДАШБОРД
+      document.getElementById('authView').classList.add('hidden');
+      
+      // Если у вас в коде есть элементы с id="managerView", "driverView" и т.д., 
+      // они должны отобразиться здесь. Например:
+      const dashboard = document.getElementById(currentRole + 'View');
+      if (dashboard) {
+          dashboard.classList.remove('hidden');
+      } else {
+          alert('Вход выполнен, но интерфейс для роли ' + currentRole + ' пока не найден в коде!');
+      }
+      
     } catch (e) {
       alert('Ошибка входа: ' + e.message);
     }
   });
-</script>
-</body>
-</html>
