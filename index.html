@@ -1,40 +1,57 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <title>FERAMED LOGISTICS</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ферамед · Диспетчер</title>
+<!-- Стили оставьте прежние, они у вас отличные -->
 </head>
-<body class="bg-gray-50">
+<body>
+<!-- (Здесь ваш HTML-код интерфейса из ферamed (2).html, просто добавьте кнопку в role-picker) -->
+<div class="options">
+  <button data-role="manager">Менеджер<span class="sub">Оформляет заказы клиникам</span></button>
+  <button data-role="driver">Водитель<span class="sub">Забирает и доставляет заказы</span></button>
+  <button data-role="leader">Руководство<span class="sub">Общая статистика</span></button>
+  <button data-role="accountant">Бухгалтер<span class="sub">Финансовая аналитика</span></button>
+</div>
 
-    <!-- Экран входа -->
-    <div id="login-screen" class="flex flex-col items-center justify-center h-screen">
-        <h1 class="text-2xl font-bold mb-8 text-teal-800">FERAMED LOGISTICS</h1>
-        <div class="bg-white p-8 rounded-xl shadow-md w-80">
-            <h2 class="mb-4 text-center">Выберите роль</h2>
-            <button onclick="login('Руководитель')" class="w-full bg-teal-600 text-white p-2 rounded mb-2">Руководитель</button>
-            <button onclick="login('Курьер')" class="w-full bg-gray-600 text-white p-2 rounded">Курьер</button>
-        </div>
-    </div>
+<!-- (Остальной HTML-код вашего ферamed (2).html остается без изменений) -->
 
-    <!-- Дашборд (скрыт по умолчанию) -->
-    <div id="dashboard" class="hidden p-8">
-        <h1 class="text-2xl font-bold mb-6 text-teal-800">FERAMED LOGISTICS</h1>
-        <div class="grid grid-cols-3 gap-6">
-            <!-- Карточки будут здесь -->
-            <div class="bg-white p-6 rounded-xl border border-gray-200">ВЫРУЧКА: <h2 id="total-revenue" class="text-2xl font-bold">0 UZS</h2></div>
-        </div>
-        <button onclick="location.reload()" class="mt-8 text-red-500">Выйти</button>
-    </div>
+<script type="module">
+// ... импорты Firebase и настройки firebaseConfig остаются прежними ...
 
-    <script>
-        function login(role) {
-            // Здесь будет логика проверки пароля или ключа
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('dashboard').style.display = 'block';
-            console.log("Вход как:", role);
-        }
-    </script>
+// ОБНОВЛЕННАЯ ЛОГИКА РОЛЕЙ
+const ROLE_NAMES = {
+    manager: 'Менеджер',
+    driver: 'Водитель',
+    leader: 'Руководство',
+    accountant: 'Бухгалтер'
+};
+
+// Функция showApp с поддержкой бухгалтера
+function showApp(){
+  hideAll();
+  document.getElementById('sessionChip').style.display='flex';
+  document.getElementById('sessionRoleTag').textContent = ROLE_NAMES[currentRole];
+  document.getElementById('sessionName').textContent = userProfile?.name || '';
+  
+  if(currentRole==='manager') document.getElementById('managerView').style.display='block';
+  if(currentRole==='driver') document.getElementById('driverView').style.display='block';
+  if(currentRole==='leader'||currentRole==='accountant') document.getElementById('leaderView').style.display='block';
+  
+  renderAll();
+}
+
+// Добавьте это в renderAll, чтобы менеджер видел свою аналитику
+function renderAll(){
+  if(currentRole==='manager') {
+      renderDispatch();
+      // Можно здесь же вызвать renderLeader(), если добавить блок аналитики в managerView
+  }
+  if(currentRole==='driver') renderDriverTab();
+  if(currentRole==='leader' || currentRole==='accountant') renderLeader();
+  if(document.getElementById('historyTab')?.style.display!=='none') renderHistory();
+}
+</script>
 </body>
 </html>
